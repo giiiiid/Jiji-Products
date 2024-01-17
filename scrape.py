@@ -22,9 +22,34 @@ response = requests.get(product_url)
 soup = BeautifulSoup(response.text, "html.parser")
 main_div = soup.body.find_all("div", class_="qa-advert-price")
 
-names = soup.body.find_all("div", class_="b-advert-title-inner qa-advert-title b-advert-title-inner--div")
+ads_li_tag = soup.find_all("li", class_="b-breadcrumb-inner")[1]
+num_of_ads = ads_li_tag.div.span.text
+num_ads_results = num_of_ads.split(" ")
 
-for i in main_div:
-    print(i.text)
-for i in names:
-    print(i.text)
+# names = soup.body.find_all("div", class_="b-advert-title-inner qa-advert-title b-advert-title-inner--div")
+
+prices = []
+product_price = soup.body.find_all("div", class_="qa-advert-price")
+for price in product_price:
+    prices.append(price.text.strip())
+
+names = []
+name_of_product = soup.body.find_all("div", class_="b-advert-title-inner qa-advert-title b-advert-title-inner--div")
+for name in name_of_product:
+    names.append(name.text.strip())
+
+# for i in names:
+#     print(i.text.strip())
+# print(names)
+# print(prices)
+
+new_dict = {names: prices for names,
+            prices in zip(names, prices)}
+# print(new_dict)
+# print("---------------------------------------------------------")
+results = {
+    "Number of ads": num_ads_results[0],
+    "Item with Prices": new_dict
+}
+
+print(results)
