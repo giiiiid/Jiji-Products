@@ -2,15 +2,17 @@ import requests
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
-
+from fastapi_pagination import Page, add_pagination, paginate
 
 app = FastAPI()
+# add_pagination(app)
 
 
 class Product(BaseModel):
     ads: str
     prices: list
     names: list
+    # price_list: dict
 
 
 @app.get("/trial")
@@ -26,11 +28,13 @@ async def get_products_data(
     
     soup = BeautifulSoup(response.text, "html.parser")
 
+
     # Number of ads per query
     ads_li_tag = soup.find_all("li", class_="b-breadcrumb-inner")[1]
     num_of_ads = ads_li_tag.div.span.text
     num_ads_results = num_of_ads.split(" ")
     final_results.update({"Number of ads": num_ads_results[0]})
+
 
     # Prices of items
     prices = []
@@ -45,12 +49,28 @@ async def get_products_data(
     for name in name_of_product:
         names.append(name.text.strip())
 
-    # item.ads = num_ads_results[0]
-    # item.names = names
-    # item.prices = prices
+    locs = []
+    location = soup.body.find_all("div", class_="b-list-advert__region")
+    for i in location:
+        locs.append(i.span.text.strip())
+
+    descs = []
+    desc_tag = soup.body.find_all("div", class_="b-list-advert-base__description-text")
+    for i in desc_tag:
+        descs.append(i.text.strip().replace("\n", "").replace("*", ""))
+
+
+    state = []
+    state_tags = soup.body.find_all("div", class_="b-list-advert-base__item-attr")
+    for state_tag in state_tags:
+        state.append(state_tag.text.strip())
+
+    new_dict = {names: [prices, locs, descs] 
+                for names,prices,locs,descs in zip(names, prices, locs, descs)}
+
+
+    # print(results)
     
-    # results = {"Product name":product_name, "item":item}
-    # results = zip(names, prices)
-    new_dict = {names: prices for names,prices in zip(names, prices)}
     final_results.update({"Products with Prices": new_dict})
+
     return final_results

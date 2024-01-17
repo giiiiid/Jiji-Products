@@ -51,5 +51,16 @@ results = {
     "Number of ads": num_ads_results[0],
     "Item with Prices": new_dict
 }
+descs = []
+desc_tag = soup.body.find_all("div", class_="b-list-advert-base__description-text")
+for i in desc_tag:
+    descs.append(i.text.strip())
 
-print(results)
+# print(results)
+location = soup.body.find_all("div", class_="b-list-advert__region")
+for i in location:
+    print(i.span.text.strip())
+
+for i in descs:
+    print(i)
+# print(descs)
