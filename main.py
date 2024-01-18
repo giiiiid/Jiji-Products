@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
-from fastapi_pagination import Page, add_pagination, paginate
+# from fastapi_pagination import Page, add_pagination, paginate
 
 app = FastAPI()
 # add_pagination(app)
@@ -57,7 +57,7 @@ async def get_products_data(
     descs = []
     desc_tag = soup.body.find_all("div", class_="b-list-advert-base__description-text")
     for i in desc_tag:
-        descs.append(i.text.strip().replace("\n", "").replace("*", ""))
+        descs.append(i.text.strip().replace("\n", "").replace("*", "").replace("...", ""))
 
 
     state = []
@@ -65,12 +65,12 @@ async def get_products_data(
     for state_tag in state_tags:
         state.append(state_tag.text.strip())
 
-    new_dict = {names: [prices, locs, descs] 
-                for names,prices,locs,descs in zip(names, prices, locs, descs)}
+    new_dict = {names: [prices, state, descs, locs,] 
+                for names,prices,state,descs,locs, in zip(names, prices, state, descs, locs)}
 
 
     # print(results)
     
-    final_results.update({"Products with Prices": new_dict})
+    final_results.update({"Products stats": new_dict})
 
     return final_results
