@@ -15,7 +15,7 @@ class Product(BaseModel):
     # price_list: dict
 
 
-@app.get("/trial")
+@app.get("/jiji-products")
 async def get_products_data(
     # item: Product,
     product_name: str = Query(..., min_length=2, include_in_schema=True)
