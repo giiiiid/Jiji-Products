@@ -1,72 +1,70 @@
 import requests
 from bs4 import BeautifulSoup
-from fastapi import FastAPI, Query
-from pydantic import BaseModel
-import random
-import string
-# app = FastAPI()
+from utils import create_short_url
 
 
-# class Product(BaseModel):
-#     name: str
-#     price: float
-#     state: str
-#     gen: str
-#     loc: str
+def get_jiji_products(product_name: str):
+    final_results = {"Product Name": product_name.title()}
+
+    product_url = f"https://jiji.com.gh/search?query={product_name}"
+    response = requests.get(product_url)
+    
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # Number of ads per query
+        ads_li_tag = soup.find_all("li", class_="b-breadcrumb-inner")[1]
+        num_of_ads = ads_li_tag.div.span.text
+        num_ads_results = num_of_ads.split(" ")
+
+        final_results.update({"Number of ads": num_ads_results[0]})
+
+        # Prices of items
+        prices = []
+        product_price = soup.body.find_all("div", class_="qa-advert-price")
+        for price in product_price:
+            prices.append(price.text.strip())
+        
+        # Names of products
+        names = []
+        name_of_product = soup.body.find_all("div", class_="b-advert-title-inner qa-advert-title b-advert-title-inner--div")
+        for name in name_of_product:
+            names.append(name.text.strip())
+
+        # Location of products
+        locs = []
+        location = soup.body.find_all("div", class_="b-list-advert__region")
+        for i in location:
+            locs.append(i.span.text.strip())
+
+        # Products description
+        descs = []
+        desc_tag = soup.body.find_all("div", class_="b-list-advert-base__description-text")
+        for i in desc_tag:
+            descs.append(i.text.strip().replace("\n", "").replace("*", "").replace("...", ""))
 
 
+        # Product state...Used or Brand new
+        state = []
+        state_tags = soup.body.find_all("div", class_="b-list-advert-base__item-attr")
+        for state_tag in state_tags:
+            state.append(state_tag.text.strip())
 
-# product_url = f"https://jiji.com.gh/search?query=razor%blade"
-# response = requests.get(product_url)
 
-# soup = BeautifulSoup(response.text, "html.parser")
-# main_div = soup.body.find_all("div", class_="qa-advert-price")
+        # Product url
+        url_div_tag = soup.body.find_all("div", class_="b-list-advert__gallery__item js-advert-list-item")
+        prefix = "https://jiji.com.gh"
+        urls = [create_short_url(f"{prefix}{i.a.get("href")}") for i in url_div_tag]     
+        
 
-# ads_li_tag = soup.find_all("li", class_="b-breadcrumb-inner")[1]
-# num_of_ads = ads_li_tag.div.span.text
-# num_ads_results = num_of_ads.split(" ")
+        # Dict to handle all key, value
+        new_dict = {names: [prices, state, descs, locs, urls] 
+                    for names,prices,state,descs,locs,urls in zip(names, prices, state, descs, locs, urls)}
 
-# # names = soup.body.find_all("div", class_="b-advert-title-inner qa-advert-title b-advert-title-inner--div")
-
-# prices = []
-# product_price = soup.body.find_all("div", class_="qa-advert-price")
-# for price in product_price:
-#     prices.append(price.text.strip())
-
-# names = []
-# name_of_product = soup.body.find_all("div", class_="b-advert-title-inner qa-advert-title b-advert-title-inner--div")
-# for name in name_of_product:
-#     names.append(name.text.strip())
-
-# # for i in names:
-# #     print(i.text.strip())
-# # print(names)
-# # print(prices)
-
-# new_dict = {names: prices for names,
-#             prices in zip(names, prices)}
-# # print(new_dict)
-# # print("---------------------------------------------------------")
-# results = {
-#     "Number of ads": num_ads_results[0],
-#     "Item with Prices": new_dict
-# }
-# descs = []
-# desc_tag = soup.body.find_all("div", class_="b-list-advert-base__description-text")
-# for i in desc_tag:
-#     descs.append(i.text.strip())
-
-# # print(results)
-# location = soup.body.find_all("div", class_="b-list-advert__region")
-# for i in location:
-#     print(i.span.text.strip())
-
-# for i in descs:
-#     print(i)
-# print(descs)
-
-# generate random letters
-
-letters = random.choices(string.ascii_lowercase, k=3)
-let = "".join(letters)
-print(let)
+        print(new_dict[prices])
+        # final results
+        final_results.update({"Products stats": new_dict})
+        return final_results
+    
+    else:
+        return None

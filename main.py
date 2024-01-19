@@ -1,6 +1,6 @@
 from fastapi import Depends, FastAPI, Query
 from pydantic import BaseModel, HttpUrl
-from utils import scrape_jiji
+from scrape import get_jiji_products
 from fastapi_pagination import Page, Params
 
 
@@ -23,7 +23,7 @@ async def get_products_data(
     # params: Params = Depends
     ):
     if product_name:
-        return scrape_jiji(product_name=product_name)
+        return get_jiji_products(product_name=product_name)
     else:
         return None
     
