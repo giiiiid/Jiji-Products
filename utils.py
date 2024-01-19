@@ -51,23 +51,15 @@ def scrape_jiji(product_name: str):
 
 
         # Product url
-        urls = []
-        # urls_tags = soup.body.find("a", class_="b-list-advert-base qa-advert-list-item b-list-advert-base--vip b-list-advert-base--gallery")
-        # for url_tag in urls_tags:
-        #     main_url = url_tag.get("href")
-        #     urls.append(main_url)
-        # print(urls_tags)
-
         url_div_tag = soup.body.find_all("div", class_="b-list-advert__gallery__item js-advert-list-item")
-        for i in url_div_tag:
-            print(i.a.get("href"))
-        # print(len(url_div_tag))
-        # print(url_div_tag)
-
+        prefix = "https://jiji.com.gh"
+        # urls = [i.a.get("href") for i in url_div_tag]  
+        urls = [f"{prefix}{i.a.get("href")}" for i in url_div_tag]     
+        
 
         # Dict to handle all key, value
-        new_dict = {names: [prices, state, descs, locs] 
-                    for names,prices,state,descs,locs in zip(names, prices, state, descs, locs)}
+        new_dict = {names: [prices, state, descs, locs, urls] 
+                    for names,prices,state,descs,locs,urls in zip(names, prices, state, descs, locs, urls)}
 
 
         # final results

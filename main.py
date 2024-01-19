@@ -1,5 +1,5 @@
 from fastapi import Depends, FastAPI, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 from utils import scrape_jiji
 from fastapi_pagination import Page, Params
 
@@ -8,9 +8,11 @@ app = FastAPI()
 # add_pagination(app)
 
 class Product(BaseModel):
-    ads: str
-    prices: list
-    names: list
+    price: str
+    state: str
+    descr: str
+    loc: str
+    short_url: HttpUrl
     # price_list: dict
 
 
