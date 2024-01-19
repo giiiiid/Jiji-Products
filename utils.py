@@ -53,7 +53,6 @@ def scrape_jiji(product_name: str):
         # Product url
         url_div_tag = soup.body.find_all("div", class_="b-list-advert__gallery__item js-advert-list-item")
         prefix = "https://jiji.com.gh"
-        # urls = [i.a.get("href") for i in url_div_tag]  
         urls = [f"{prefix}{i.a.get("href")}" for i in url_div_tag]     
         
 
