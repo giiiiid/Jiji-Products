@@ -43,6 +43,7 @@ def scrape_jiji(product_name: str):
         for i in desc_tag:
             descs.append(i.text.strip().replace("\n", "").replace("*", "").replace("...", ""))
 
+
         # Product state...Used or Brand new
         state = []
         state_tags = soup.body.find_all("div", class_="b-list-advert-base__item-attr")
