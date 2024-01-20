@@ -25,17 +25,20 @@ def get_jiji_products(product_name: str):
         for price in product_price:
             prices.append(price.text.strip())
         
+
         # Names of products
         names = []
         name_of_product = soup.body.find_all("div", class_="b-advert-title-inner qa-advert-title b-advert-title-inner--div")
         for name in name_of_product:
             names.append(name.text.strip())
 
+
         # Location of products
         locs = []
         location = soup.body.find_all("div", class_="b-list-advert__region")
         for i in location:
             locs.append(i.span.text.strip())
+
 
         # Products description
         descs = []
@@ -61,7 +64,7 @@ def get_jiji_products(product_name: str):
         new_dict = {names: [prices, state, descs, locs, urls] 
                     for names,prices,state,descs,locs,urls in zip(names, prices, state, descs, locs, urls)}
 
-        print(new_dict[prices])
+        # print(new_dict[prices])
         # final results
         final_results.update({"Products stats": new_dict})
         return final_results
