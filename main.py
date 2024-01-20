@@ -7,13 +7,7 @@ from fastapi_pagination import Page, Params
 app = FastAPI()
 # add_pagination(app)
 
-class Product(BaseModel):
-    price: str
-    state: str
-    descr: str
-    loc: str
-    short_url: HttpUrl
-    # price_list: dict
+
 
 
 @app.get("/jiji-products")
